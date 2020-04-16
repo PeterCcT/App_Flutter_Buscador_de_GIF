@@ -24,6 +24,37 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Text(
+          "Just some gif's",
+          style: TextStyle(fontSize: 30),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: "Pesquise Gif's",
+                labelStyle: TextStyle(
+                    fontSize: 16, color: Colors.white, letterSpacing: 1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              style: TextStyle(
+                  fontSize: 16, color: Colors.white, letterSpacing: 3),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
