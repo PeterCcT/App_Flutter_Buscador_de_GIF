@@ -15,9 +15,9 @@ class _HomeState extends State<Home> {
     http.Response response;
     _search == null
         ? response = await http.get(
-            "https://api.giphy.com/v1/gifs/trending?api_key=3iWCUqFWztfhFCv5E2pCTxzWWNvrHD7Z&limit=10&rating=G")
+            "https://api.giphy.com/v1/gifs/trending?api_key=3iWCUqFWztfhFCv5E2pCTxzWWNvrHD7Z&limit=20&rating=G")
         : response = await http.get(
-            "https://api.giphy.com/v1/gifs/search?api_key=3iWCUqFWztfhFCv5E2pCTxzWWNvrHD7Z&q=$_search&limit=30&offset=$_offset&rating=G&lang=pt");
+            "https://api.giphy.com/v1/gifs/search?api_key=3iWCUqFWztfhFCv5E2pCTxzWWNvrHD7Z&q=$_search&limit=20&offset=$_offset&rating=G&lang=pt");
 
     return json.decode(response.body);
   }
@@ -51,10 +51,56 @@ class _HomeState extends State<Home> {
               style: TextStyle(
                   fontSize: 16, color: Colors.white, letterSpacing: 3),
               textAlign: TextAlign.center,
+              onSubmitted: ,
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: _getGif(),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case (ConnectionState.waiting):
+                  case (ConnectionState.none):
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Colors.white),
+                        strokeWidth: 5,
+                      ),
+                    );
+                  default:
+                    if (snapshot.hasError)
+                      return Container();
+                    else
+                      return _gifTable(context, snapshot);
+                }
+              },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _gifTable(context,snapshot) {
+    return GridView.builder(
+        padding: EdgeInsets.all(5),
+        itemCount: snapshot.data["data"].length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 5,
+          mainAxisSpacing: 5,
+        ),
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            child: Image.network(
+              snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+              fit: BoxFit.fill,
+              height: 300,
+            ),
+          );
+        });
   }
 }
