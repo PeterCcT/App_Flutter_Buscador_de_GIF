@@ -11,6 +11,24 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String _search;
   int _offset = 0;
+
+  ScrollController _scroll = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _scroll.addListener(
+      () {
+        if (_scroll.offset >= _scroll.position.maxScrollExtent) {
+          setState(() {
+            _offset += 10;
+          });
+        }
+      },
+    );
+  }
+
   Future<Map> _getGif() async {
     http.Response response;
     _search == null
@@ -20,6 +38,10 @@ class _HomeState extends State<Home> {
             "https://api.giphy.com/v1/gifs/search?api_key=3iWCUqFWztfhFCv5E2pCTxzWWNvrHD7Z&q=$_search&limit=20&offset=$_offset&rating=G&lang=pt");
 
     return json.decode(response.body);
+  }
+
+  double _tamamhoTela(context) {
+    return MediaQuery.of(context).size.height;
   }
 
   @override
@@ -51,7 +73,11 @@ class _HomeState extends State<Home> {
               style: TextStyle(
                   fontSize: 16, color: Colors.white, letterSpacing: 3),
               textAlign: TextAlign.center,
-              onSubmitted: ,
+              onSubmitted: (text) {
+                setState(() {
+                  _search = text;
+                });
+              },
             ),
           ),
           Expanded(
@@ -84,23 +110,25 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _gifTable(context,snapshot) {
+  Widget _gifTable(context, snapshot) {
     return GridView.builder(
-        padding: EdgeInsets.all(5),
-        itemCount: snapshot.data["data"].length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 5,
-          mainAxisSpacing: 5,
-        ),
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            child: Image.network(
-              snapshot.data["data"][index]["images"]["fixed_height"]["url"],
-              fit: BoxFit.fill,
-              height: 300,
-            ),
-          );
-        });
+      controller: _scroll,
+      padding: EdgeInsets.all(5),
+      itemCount: snapshot.data["data"].length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5,
+      ),
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          child: Image.network(
+            snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+            fit: BoxFit.fill,
+            height: 300,
+          ),
+        );
+      },
+    );
   }
 }
