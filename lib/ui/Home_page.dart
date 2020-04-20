@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:buscador_de_gif/ui/gif_pag.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:share/share.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -74,6 +75,7 @@ class _HomeState extends State<Home> {
               onSubmitted: (text) {
                 setState(() {
                   _search = text;
+                  _offset = 0;
                 });
               },
             ),
@@ -140,6 +142,10 @@ class _HomeState extends State<Home> {
                   builder: (context) => GifPage(snapshot.data["data"][index]),
                 ),
               );
+            },
+            onLongPress: () {
+              Share.share(snapshot.data["data"][index]["images"]["fixed_height"]
+                  ["url"]);
             },
           );
         else
