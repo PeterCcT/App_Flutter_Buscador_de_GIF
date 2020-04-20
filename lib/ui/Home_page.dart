@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:buscador_de_gif/ui/gif_pag.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,6 +12,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String _search;
   int _offset = 0;
+  List<Image> gifs = [];
 
   ScrollController _scroll = ScrollController();
 
@@ -38,10 +40,6 @@ class _HomeState extends State<Home> {
             "https://api.giphy.com/v1/gifs/search?api_key=3iWCUqFWztfhFCv5E2pCTxzWWNvrHD7Z&q=$_search&limit=20&offset=$_offset&rating=G&lang=pt");
 
     return json.decode(response.body);
-  }
-
-  double _tamamhoTela(context) {
-    return MediaQuery.of(context).size.height;
   }
 
   @override
@@ -110,24 +108,48 @@ class _HomeState extends State<Home> {
     );
   }
 
+  int _count(List dados) {
+    if (_search == null)
+      return dados.length;
+    else
+      return dados.length + 1;
+  }
+
   Widget _gifTable(context, snapshot) {
     return GridView.builder(
       controller: _scroll,
       padding: EdgeInsets.all(5),
-      itemCount: snapshot.data["data"].length,
+      itemCount: _count(snapshot.data["data"]),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 5,
         mainAxisSpacing: 5,
       ),
       itemBuilder: (context, index) {
-        return GestureDetector(
-          child: Image.network(
-            snapshot.data["data"][index]["images"]["fixed_height"]["url"],
-            fit: BoxFit.fill,
-            height: 300,
-          ),
-        );
+        if (_search == null || index < snapshot.data["data"].length)
+          return GestureDetector(
+            child: Image.network(
+              snapshot.data["data"][index]["images"]["fixed_height"]["url"],
+              fit: BoxFit.fill,
+              height: 300,
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GifPage(snapshot.data["data"][index]),
+                ),
+              );
+            },
+          );
+        else
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Icon(Icons.ac_unit),
+              ],
+            ),
+          );
       },
     );
   }
